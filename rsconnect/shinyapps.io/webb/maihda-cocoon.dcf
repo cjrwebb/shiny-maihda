@@ -1,0 +1,12 @@
+name: maihda-cocoon
+title: maihda-cocoon
+username: webb
+account: webb
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 14887277
+bundleId: 10403991
+url: https://webb.shinyapps.io/maihda-cocoon/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE
