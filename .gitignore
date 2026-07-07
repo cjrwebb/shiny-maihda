@@ -4,5 +4,5 @@
 .Ruserdata
 MAIHDA Tutorial Code _spl_4_spl_.R
 R code for making predictions datasets.R
-rsconnect
+rsconnect/
 TutorialData.dta
