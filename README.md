@@ -8,4 +8,4 @@ In order to use the app, you will need two sets of level 2 estimates (as .csv fi
 
 This tool will then produce interactive graphs displaying those predictions, that allow you to identify particular strata, or particular combinations of strata-defining variables. Please note that no data you upload is stored in any way beyond your session.<br>
 
-To cite the app, please use the following citation: Webb, C. and Bell, A. (2026). <em>Interactive tool for exploring MAIHDA strata predictions.</em> Available at <a href="https://webb.shinyapps.io/maihda-cocoon/">https://webb.shinyapps.io/maihda-cocoon/</a>
+To cite the app, please use the following citation: Webb, C. and Bell, A. (2026). <em>Interactive tool for exploring MAIHDA strata predictions.</em> Available at <a href="https://webb.shinyapps.io/maihda-cocoon/">https://webb.shinyapps.io/maihda-cocoon/</a> doi: 10.15131/shef.data.32925566
