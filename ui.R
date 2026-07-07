@@ -35,7 +35,7 @@ mytheme <- create_theme(theme = "flatly",
                           nav_tabs_link_active_color = ipse_green,
                           main_footer_bg = ipse_green,
                           main_footer_height = "100px",
-                          link_color = ipse_green, 
+                          link_color = ipse_yellow, 
                           family_sans_serif = "Source Sans Pro"
                         )
 )
@@ -76,6 +76,21 @@ bs4DashPage(
           .js-irs-0 .irs-single, .js-irs-0 .irs-bar-edge, .js-irs-0 .irs-bar {background: #44009B}
           .js-irs-1 .irs-single, .js-irs-1 .irs-bar-edge, .js-irs-1 .irs-bar {background: #44009B}
           
+          .shiny-output-error { color: #44009B; }
+          .shiny-output-error:before { visibility: hidden; }
+          
+          .ui-row {
+            min-height: 50px;
+          }
+      
+          .ui-row-large {
+            min-height: 85px;
+          }
+      
+          .ui-row-small {
+            min-height: 35px;
+          }
+          
           "
   )
   ),
@@ -107,8 +122,11 @@ bs4DashPage(
                    column(width = 2), # I like to centre things using some empty columns
                    column(width = 8,
                           # Title of the page
-                          HTML('<h2><br><p align="center">Interactive Caterpillar Plot</p></h2><br>'),
-                          HTML('<div class="sans-serif">Current bugs: If strata contain identical string patterns at the start, this will sometimes cause both strata to be selected. E.g. Income: Low and Income: Low-Mid will both be selected if Income: Low is chosen, because the string "Income: Low" is detected in the string "Income: Low-Mid". This would be solved by adding a unique strata value number, e.g. Income 1: Low, Income 2: Low-Mid, but this is currently not trivial to add to the data tidying process.<br><br></div>')
+                          HTML('<h2><br><p align="center">Interactive tool for exploring MAIHDA strata predictions</p></h2><br>'),
+                          HTML('<div class="sans-serif">This tool allows you to explore estimates from a MAIHDA model — where level 2 units have been defined based on combinations of other variables. For more on how to use these models, see this <a href="https://www.sciencedirect.com/science/article/pii/S235282732400065X">tutorial paper</a>.<br><br>
+                               In order to use the app, you will need two sets of level 2 estimates (as .csv files): one that are full predictions (based on both the fixed part and the level 2 random part of a MAIHDA model), and another that are the multiplicative predictions (based on the random effects estimates from MAIHDA model). The files should have a column for each strata defining variable, and either standard errors or confidence intervals for the estimates\' uncertainty.  To see some example .csv files, which you can also use to test the app, see the <a href="">github repository</a>.<br><br>
+                               This tool will then produce interactive graphs displaying those predictions, that allow you to identify particular strata, or particular combinations of strata-defining variables. Please note that no data you upload is stored in any way beyond your session.<br><br>
+                               To cite the app, please use the following citation: Webb, C. and Bell, A. (2026). <i>Interactive tool for exploring MAIHDA strata predictions.</i> Available at <a href="https://webb.shinyapps.io/maihda-cocoon/">https://webb.shinyapps.io/maihda-cocoon/</a><br><br></div>')
                    ),
                    column(width = 2)
                  ),
@@ -119,28 +137,44 @@ bs4DashPage(
                           box(
                             width = 12,
                             background = "olive",
-                            fileInput("uploaded_multiple_effects", 
-                                      label = "Upload Random Intercepts on the Multiplicative Scale:", 
-                                      accept = c(".csv", ".tsv")),
-                            uiOutput("est_select_multi"),
-                            uiOutput("se_select_multi"),
-                            uiOutput("lb_select_multi"),
-                            uiOutput("ub_select_multi"),
-                            uiOutput("id_select_multi")
+                            div(class="ui-row",
+                            HTML("Upload full predictions from MAIHDA model:")
+                            ),
+                            div(class="ui-row",
+                                fileInput("uploaded_full_effects", 
+                                      label = "", 
+                                      accept = c(".csv", ".tsv"))
+                                ),
+                            uiOutput("helper_full"),
+                            uiOutput("est_select_full"),
+                            uiOutput("se_blurb_full"),
+                            uiOutput("se_select_full"),
+                            uiOutput("lb_select_full"),
+                            uiOutput("ub_select_full"),
+                            uiOutput("id_select_note_full"),
+                            uiOutput("id_select_full")
                           )
                           ),
                    column(width = 4,
                           box(
                             width = 12,
                             background = "olive",
-                            fileInput("uploaded_full_effects", 
-                                      label = "Upload Random Intercepts on the Full Model Prediction Scale:", 
-                                      accept = c(".csv", ".tsv")),
-                            uiOutput("est_select_full"),
-                            uiOutput("se_select_full"),
-                            uiOutput("lb_select_full"),
-                            uiOutput("ub_select_full"),
-                            uiOutput("id_select_full")
+                            div(class="ui-row",
+                                HTML("Upload multiplicative effects from MAIHDA model:")
+                                ),
+                            div(class="ui-row",
+                                fileInput("uploaded_multiple_effects", 
+                                      label = "", 
+                                      accept = c(".csv", ".tsv"))
+                                ),
+                            uiOutput("helper_multi"),
+                            uiOutput("est_select_multi"),
+                            uiOutput("se_blurb_multi"),
+                            uiOutput("se_select_multi"),
+                            uiOutput("lb_select_multi"),
+                            uiOutput("ub_select_multi"),
+                            uiOutput("id_select_note_multi"),
+                            uiOutput("id_select_multi")
                             )
                           ),
                    column(width = 2)
@@ -159,9 +193,10 @@ bs4DashPage(
                  fluidRow(
                    column(width = 12,
                           box(id = "caterpillar_plot", title = "Interactive Plot", 
-                              HTML('<div class="sans-serif">Click once on any stratum trace to highlight it across both full predictions and multiplicative random intercepts. Double-click anywhere else on the plot to deselect the trace.</div>'),
-                              plotlyOutput("caterpillar_plot_out", height = "600px"),
-                              width = 12, height = "650px", maximizable = TRUE,
+                              HTML('<div class="sans-serif">Click on the points on the graph to highlight that point, identify it\'s strata, and identify the same strata\'s point on the other graph.<br><br></div>'),
+                              uiOutput("plot_ui"),
+                              #plotlyOutput("caterpillar_plot_out", height = "650px"),
+                              width = 12, height = "100px", maximizable = TRUE,
                               background = "olive"
                           )
                    )
