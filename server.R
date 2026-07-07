@@ -275,7 +275,7 @@ shinyServer(function(input, output, session){
     
     validate(need(!is.null(input$uploaded_multiple_effects) | !is.null(input$uploaded_full_effects), "Please provide either a multiplicative effects file or a full effects file (or both)"))
 
-    updateBox(id = "caterpillar_plot", action = "update", options = list(height = "700px"))
+    updateBox(id = "caterpillar_plot", action = "update", options = list(height = "800px"))
   
     tryCatch(
       create_interactive_plot(mult_effs = multi_eff_data(), 
