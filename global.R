@@ -201,11 +201,9 @@ create_interactive_plot <- function(mult_effs = NULL, full_effs = NULL,
     group_by(id) %>%
     summarise(
       hline = mean(est, na.rm = TRUE)
-    ) %>%
-    mutate(
-      hline = ifelse(id == "Stratum Random Effect", 0, hline)
-    )
-  print(hlines)
+    ) 
+  
+  #print(hlines)
   
   if (is.null(emphasise)) {
     strata_plot <- d %>%
